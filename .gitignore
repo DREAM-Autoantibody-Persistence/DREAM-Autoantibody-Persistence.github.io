@@ -1,0 +1,16 @@
+# DREAM original participant-level workbooks (obtain from source site)
+data/
+
+# Generated analysis outputs and local artifacts
+results/
+logs/
+*.pending.xlsx
+
+# Python environments and transient files
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.DS_Store
+Thumbs.db
