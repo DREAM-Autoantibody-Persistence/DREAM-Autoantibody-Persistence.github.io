@@ -88,6 +88,7 @@
     </div>
     <div class="links">
       <a href="https://github.com/DREAM-Autoantibody-Persistence/DREAM-Autoantibody-Persistence.github.io">View code on GitHub</a>
+      <a class="ghost" href="https://github.com/DREAM-Autoantibody-Persistence/DREAM-Autoantibody-Persistence.github.io/archive/refs/heads/main.zip">Download code ZIP</a>
       <a class="ghost" href="https://www.med.upenn.edu/cpob/dream-data-export">DREAM source data</a>
     </div>
   </div>
@@ -135,7 +136,7 @@
       <tr><td class="mono">wp.xlsx</td><td>WP</td><td>Work and activity outcomes / supplementary checks</td></tr>
     </tbody>
   </table>
-  <p>The script <code>dream_common.py</code> verifies each workbook against <code>source_manifest.csv</code> (SHA-256 checksums) before analysis. The manifest hashes were generated from the analysis input copies used to prepare this code archive and have not been independently authenticated against a fresh official download; if a current download fails verification, investigate the source-file version rather than bypassing the check.</p>
+  <p>The script <code>dream_common.py</code> verifies each workbook against <code>source_manifest.csv</code> (SHA-256 checksums) before analysis. On 14 November 2026, all eight official workbooks were downloaded again and their SHA-256 checksums matched the manifest. All eight public scripts ran successfully with Python 3.10.0 and the pinned dependencies. The 42 output worksheets matched the existing results after normalizing the institutional source-host names, with numerical agreement within 1e-10. If a later download fails verification, investigate the source-file version rather than bypassing the check.</p>
 </section>
 
 <section id="pipeline">
@@ -203,7 +204,7 @@ python RUN_STEP08.py</code></pre>
   <ul>
     <li>This is a secondary analysis of the original randomized trial; the present autoantibody analyses should not be interpreted as estimating a causal treatment effect.</li>
     <li>Antibody results were measured at two visits approximately one year apart; the data cannot distinguish analytic variation from biological fluctuation or prove continuous positivity between visits.</li>
-    <li>Missing follow-up measurements and post hoc exploratory comparisons affect interpretation.</li>
+    <li>Missing follow-up measurements and exploratory comparisons affect interpretation.</li>
     <li>Participant-level datasets, case report forms, and original data dictionaries belong to the DREAM source provider and are not redistributed here.</li>
     <li>External users should verify that the manifest hashes agree with the official files available to them and record the software versions printed by Step&nbsp;01.</li>
   </ul>

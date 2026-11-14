@@ -25,7 +25,7 @@ Download the following eight workbooks from that official page, retaining these 
 
 The official website also provides case report forms and a laboratory results data dictionary. Please consult those documents for the original variable definitions and coding. Data are made available by the DREAM investigators; obtain them from the source and follow any applicable source-data reuse conditions rather than treating the files as part of this code repository.
 
-Place all eight files in a folder called `data/` in the project directory. The script `dream_common.py` verifies each workbook against `source_manifest.csv` before analysis. The manifest's SHA-256 checksums were generated from the analysis input copies used to prepare this code archive; **they have not been independently authenticated against a fresh official download**. If a current official download fails verification, investigate the source-file version rather than simply bypassing the check.
+Place all eight files in a folder called `data/` in the project directory. The script `dream_common.py` verifies each workbook against `source_manifest.csv` before analysis. The manifest records the SHA-256 checksums of the analysis inputs. On 14 November 2026, all eight files were downloaded again from the official University of Pennsylvania data site and their checksums matched the manifest. If a later official download fails verification, investigate the source-file version rather than bypassing the check.
 
 ## Repository structure
 
@@ -65,7 +65,7 @@ scipy==1.15.3
 statsmodels==0.15.0
 ```
 
-The code also ran successfully in a separate audit using a different Python/library environment, but exact reproduction using the above pinned versions has not yet been independently established. `RUN_STEP01.py` reports the actually installed versions; it checks package availability but does **not** reject all package-version mismatches.
+On 14 November 2026, all eight public scripts from commit `cd739ea1d3ab58c179d6c602d81e793d3576a162` ran successfully with Python 3.10.0 and the five pinned dependency versions above, using freshly downloaded official workbooks. All 42 output worksheets matched the existing analysis outputs at an absolute numerical tolerance of 1e-10 after treating the provider's `www.med.upenn.edu` and `www.cceb.upenn.edu` source-host names as equivalent metadata. `RUN_STEP01.py` reports the actually installed versions; it checks package availability but does **not** reject all package-version mismatches.
 
 To install dependencies in an isolated environment (commands shown for Windows PowerShell):
 
@@ -136,7 +136,7 @@ These values are descriptive outputs for reproducibility checks. They do not est
 
 - This is a secondary analysis of the original randomized trial; the present autoantibody analyses should not be interpreted as estimating a causal treatment effect.
 - Antibody results were measured at two visits approximately one year apart; the data cannot distinguish analytic variation from biological fluctuation or prove continuous positivity between visits.
-- Missing follow-up measurements and post hoc exploratory comparisons affect interpretation.
+- Missing follow-up measurements and exploratory comparisons affect interpretation.
 - Participant-level datasets, case report forms, and original data dictionaries belong to the DREAM source provider and are not redistributed here.
 - External users should verify that the manifest hashes agree with the official files available to them and record the software versions printed by Step 01.
 
