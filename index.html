@@ -1,230 +1,36 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>DREAM Autoantibody Persistence</title>
-<meta name="description" content="Reproducible analysis code for longitudinal changes in candidate Sjögren autoantibodies in the DREAM trial.">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧬</text></svg>">
+<title>DREAM Autoantibody Analysis Code</title>
 <style>
-  :root{
-    --ink:#1a2332; --muted:#5a6678; --line:#e3e8ef; --bg:#ffffff; --soft:#f6f8fb;
-    --accent:#0f5e8c; --accent-2:#11897f; --warn-bg:#fff7e8; --warn-line:#e8c98a;
-  }
-  *{box-sizing:border-box}
-  html{scroll-behavior:smooth}
-  body{margin:0;font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;color:var(--ink);background:var(--bg)}
-  a{color:var(--accent);text-decoration:none}
-  a:hover{text-decoration:underline}
-  code,.mono{font-family:ui-monospace,SFMono-Regular,Consolas,"Liberation Mono",Menlo,monospace;font-size:.92em}
-  code{background:var(--soft);border:1px solid var(--line);border-radius:4px;padding:.1em .35em}
-
-  header.hero{background:linear-gradient(135deg,#0d3b57 0%,#0f5e8c 55%,#11897f 100%);color:#fff;padding:4.2rem 1.25rem 4.6rem}
-  .hero-inner{max-width:880px;margin:0 auto}
-  .hero h1{font-size:2.3rem;line-height:1.2;margin:0 0 .6rem;letter-spacing:-.01em}
-  .hero p.sub{font-size:1.12rem;max-width:46rem;color:#dcecf5;margin:0 0 1.4rem}
-  .hero .meta{display:flex;flex-wrap:wrap;gap:.5rem}
-  .hero .meta span{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.25);border-radius:999px;padding:.22rem .8rem;font-size:.85rem}
-  .hero .links{margin-top:1.6rem;display:flex;flex-wrap:wrap;gap:.7rem}
-  .hero .links a{background:#fff;color:var(--accent);border-radius:6px;padding:.5rem 1rem;font-weight:600;font-size:.95rem}
-  .hero .links a.ghost{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.5)}
-  .hero .links a:hover{text-decoration:none;filter:brightness(.96)}
-
-  nav.toc{position:sticky;top:0;z-index:10;background:rgba(255,255,255,.94);backdrop-filter:blur(6px);border-bottom:1px solid var(--line)}
-  nav.toc ul{max-width:880px;margin:0 auto;padding:.55rem 1.25rem;list-style:none;display:flex;flex-wrap:wrap;gap:.25rem}
-  nav.toc a{display:block;padding:.3rem .7rem;border-radius:6px;color:var(--muted);font-size:.9rem}
-  nav.toc a:hover{background:var(--soft);color:var(--ink);text-decoration:none}
-
-  main{max-width:880px;margin:0 auto;padding:2.5rem 1.25rem 4rem}
-  section{margin:0 0 3.2rem;scroll-margin-top:3.6rem}
-  h2{font-size:1.45rem;margin:0 0 1rem;padding-bottom:.45rem;border-bottom:2px solid var(--line);letter-spacing:-.01em}
-  h3{font-size:1.08rem;margin:1.6rem 0 .55rem}
-  p{margin:.65rem 0}
-  ul{margin:.6rem 0;padding-left:1.3rem}
-  li{margin:.32rem 0}
-
-  .note{background:var(--warn-bg);border:1px solid var(--warn-line);border-left:4px solid #c9971f;border-radius:6px;padding:.85rem 1rem;margin:1rem 0;font-size:.95rem}
-  .note strong:first-child{color:#8a6410}
-
-  table{border-collapse:collapse;width:100%;margin:1rem 0;font-size:.93rem;display:block;overflow-x:auto}
-  th,td{border:1px solid var(--line);padding:.48rem .7rem;text-align:left;vertical-align:top}
-  th{background:var(--soft);font-weight:600;white-space:nowrap}
-  tbody tr:nth-child(even){background:#fafbfd}
-  td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
-
-  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:1rem;margin:1.1rem 0}
-  .card{border:1px solid var(--line);border-radius:10px;padding:1rem 1.1rem;background:var(--soft)}
-  .card .big{font-size:1.7rem;font-weight:700;color:var(--accent);line-height:1.15}
-  .card .lbl{font-size:.85rem;color:var(--muted);margin-top:.15rem}
-
-  .steps{list-style:none;padding:0;margin:1rem 0;counter-reset:step}
-  .steps li{counter-increment:step;position:relative;padding:.7rem 0 .7rem 3.3rem;border-bottom:1px solid var(--line)}
-  .steps li:last-child{border-bottom:none}
-  .steps li::before{content:counter(step,decimal-leading-zero);position:absolute;left:0;top:.75rem;width:2.2rem;height:2.2rem;border-radius:50%;background:var(--accent);color:#fff;font-weight:700;font-size:.8rem;display:flex;align-items:center;justify-content:center}
-  .steps b{display:block}
-  .steps .out{color:var(--muted);font-size:.88rem}
-
-  pre{background:#0f172a;color:#e2e8f0;border-radius:8px;padding:1rem 1.1rem;overflow-x:auto;font-size:.86rem;line-height:1.55}
-  pre code{background:none;border:none;color:inherit;padding:0}
-
-  .callout{border-left:4px solid var(--accent);background:var(--soft);border-radius:0 8px 8px 0;padding:.85rem 1.1rem;margin:1rem 0}
-
-  footer{border-top:1px solid var(--line);color:var(--muted);font-size:.88rem;text-align:center;padding:1.6rem 1rem 2.4rem}
-  footer p{margin:.3rem 0}
-  @media (max-width:640px){.hero h1{font-size:1.7rem}}
+body{max-width:820px;margin:48px auto;padding:0 20px;font:16px/1.6 Arial,sans-serif;color:#222;background:#fff}
+h1{font-size:28px;line-height:1.25}h2{font-size:20px;margin-top:28px}
+a{color:#145b85}table{border-collapse:collapse;width:100%;margin:16px 0}th,td{text-align:left;border-bottom:1px solid #ddd;padding:9px 10px}th{background:#f5f5f5}
+code{font-family:Consolas,monospace;font-size:.95em}p{margin:14px 0}
 </style>
 </head>
 <body>
-
-<header class="hero">
-  <div class="hero-inner">
-    <h1>DREAM Autoantibody Persistence</h1>
-    <p class="sub">Reproducible analysis code for longitudinal changes in candidate Sjögren autoantibodies in the Dry Eye Assessment and Management (DREAM) trial.</p>
-    <div class="meta">
-      <span>ClinicalTrials.gov NCT02128763</span>
-      <span>Python 3.10</span>
-      <span>8 analysis scripts</span>
-      <span>Secondary analysis of public data</span>
-    </div>
-    <div class="links">
-      <a href="https://github.com/DREAM-Autoantibody-Persistence/DREAM-Autoantibody-Persistence.github.io">View code on GitHub</a>
-      <a class="ghost" href="https://github.com/DREAM-Autoantibody-Persistence/DREAM-Autoantibody-Persistence.github.io/archive/refs/heads/main.zip">Download code ZIP</a>
-      <a class="ghost" href="https://www.med.upenn.edu/cpob/dream-data-export">DREAM source data</a>
-    </div>
-  </div>
-</header>
-
-<nav class="toc" aria-label="Section navigation">
-  <ul>
-    <li><a href="#overview">Overview</a></li>
-    <li><a href="#data">Data</a></li>
-    <li><a href="#pipeline">Pipeline</a></li>
-    <li><a href="#definitions">Definitions</a></li>
-    <li><a href="#checks">Output checks</a></li>
-    <li><a href="#limitations">Limitations</a></li>
-    <li><a href="#citation">Citation</a></li>
-  </ul>
-</nav>
-
-<main>
-
-<section id="overview">
-  <h2>Overview</h2>
-  <div class="grid">
-    <div class="card"><div class="big">9</div><div class="lbl">candidate assays: IgG / IgA / IgM against SP1, CA6, PSP</div></div>
-    <div class="card"><div class="big">2</div><div class="lbl">visits per participant: baseline and month 12</div></div>
-    <div class="card"><div class="big">407</div><div class="lbl">participants in the paired analysis cohort</div></div>
-    <div class="card"><div class="big">8</div><div class="lbl">independent scripts, each starting from the official workbooks</div></div>
-  </div>
-  <p>This repository contains Python scripts for a secondary analysis of publicly available DREAM trial data. It evaluates 12-month changes in nine candidate autoantibody assays: IgG, IgA, and IgM directed against salivary protein&nbsp;1 (SP1), carbonic anhydrase&nbsp;VI (CA6), and parotid secretory protein (PSP). Anti-SSA/Ro and anti-SSB/La results are used for cohort eligibility and selected reference analyses.</p>
-  <div class="note"><strong>Scope.</strong> This is an analysis of repeated laboratory results among DREAM participants with moderate-to-severe dry eye disease, <strong>not</strong> a validation study of Sjögren disease diagnosis or clinical monitoring. This repository does not contain individual-level DREAM data.</div>
-</section>
-
-<section id="data">
-  <h2>Data source</h2>
-  <p>The original DREAM trial (NCT02128763) enrolled 535 participants. Source data and study documentation are available from the University of Pennsylvania&rsquo;s official <a href="https://www.med.upenn.edu/cpob/dream-data-export">DREAM Data and Documents page</a>. Download the following eight workbooks, retaining these filenames, and place them in a local <code>data/</code> folder:</p>
-  <table>
-    <thead><tr><th>Filename</th><th>DREAM dataset</th><th>Use in this analysis</th></tr></thead>
-    <tbody>
-      <tr><td class="mono">sjo-results.xlsx</td><td>SJO_RESULTS</td><td>Autoantibody concentrations and collection-day codes</td></tr>
-      <tr><td class="mono">gi.xlsx</td><td>GI</td><td>Participant characteristics and randomized assignment</td></tr>
-      <tr><td class="mono">mh.xlsx</td><td>MH</td><td>Self-reported medical histories</td></tr>
-      <tr><td class="mono">eo.xlsx</td><td>EO</td><td>Baseline ocular examinations</td></tr>
-      <tr><td class="mono">oa.xlsx</td><td>OA</td><td>Follow-up ocular examinations</td></tr>
-      <tr><td class="mono">osi.xlsx</td><td>OSI</td><td>Ocular Surface Disease Index</td></tr>
-      <tr><td class="mono">br.xlsx</td><td>BR</td><td>Baseline health review / supplementary checks</td></tr>
-      <tr><td class="mono">wp.xlsx</td><td>WP</td><td>Work and activity outcomes / supplementary checks</td></tr>
-    </tbody>
-  </table>
-  <p>The script <code>dream_common.py</code> verifies each workbook against <code>source_manifest.csv</code> (SHA-256 checksums) before analysis. On 14 November 2026, all eight official workbooks were downloaded again and their SHA-256 checksums matched the manifest. All eight public scripts ran successfully with Python 3.10.0 and the pinned dependencies. The 42 output worksheets matched the existing results after normalizing the institutional source-host names, with numerical agreement within 1e-10. If a later download fails verification, investigate the source-file version rather than bypassing the check.</p>
-</section>
-
-<section id="pipeline">
-  <h2>Reproduce the analyses</h2>
-  <p>Python <strong>3.10</strong> is recommended with the versions pinned in <code>requirements.txt</code> (numpy 2.2.6, pandas 2.3.3, openpyxl 3.1.5, scipy 1.15.3, statsmodels 0.15.0). After the eight workbooks are in <code>data/</code>, run from the repository root:</p>
-  <pre><code>py -3.10 -m venv .venv
-.\.venv\Scripts\Activate.ps1        # macOS/Linux: source .venv/bin/activate
-python -m pip install -r requirements.txt
-
-python RUN_STEP01.py
-python RUN_STEP02.py
-python RUN_STEP03.py
-python RUN_STEP04.py
-python RUN_STEP05.py
-python RUN_STEP06.py
-python RUN_STEP07.py
-python RUN_STEP08.py</code></pre>
-  <p>The default output directory is <code>results/</code>; add <code>--data-dir PATH</code> and/or <code>--output-dir PATH</code> to any command to override. Each step writes a workbook with a <code>Contents</code> worksheet and its analysis output worksheets.</p>
-
-  <h3>Analysis pipeline</h3>
-  <ol class="steps">
-    <li><b>Validate data files, required fields, software versions</b><span class="out"><code>RUN_STEP01.py</code> → <code>STEP01_source_checks.xlsx</code></span></li>
-    <li><b>Reconstruct the baseline/month-12 paired cohort</b><span class="out"><code>RUN_STEP02.py</code> → <code>STEP02_cohort.xlsx</code></span></li>
-    <li><b>Panel transitions, persistence, paired net change, bootstrap intervals</b><span class="out"><code>RUN_STEP03.py</code> → <code>STEP03_main_results.xlsx</code></span></li>
-    <li><b>Assay-specific patterns and supporting sensitivity checks</b><span class="out"><code>RUN_STEP04.py</code> → <code>STEP04_supporting_results.xlsx</code></span></li>
-    <li><b>Assemble selected manuscript-facing summary tables</b><span class="out"><code>RUN_STEP05.py</code> → <code>STEP05_manuscript_tables.xlsx</code></span></li>
-    <li><b>Nested persistence, baseline-level models, ocular outcomes, missingness</b><span class="out"><code>RUN_STEP06.py</code> → <code>STEP06_models_and_sensitivity.xlsx</code></span></li>
-    <li><b>Exact two-sided McNemar tests</b><span class="out"><code>RUN_STEP07.py</code> → <code>STEP07_mcnemar.xlsx</code></span></li>
-    <li><b>Exploratory comparisons by original randomized assignment</b><span class="out"><code>RUN_STEP08.py</code> → <code>STEP08_randomized_arms.xlsx</code></span></li>
-  </ol>
-  <p><code>dream_common.py</code> is required by all eight scripts; it standardizes source validation, laboratory measurements, participant pairing, ocular outcome construction, and Excel exports. The scripts can be executed independently against the same source data — they do <strong>not</strong> read intermediate analysis results.</p>
-</section>
-
-<section id="definitions">
-  <h2>Analysis definitions</h2>
-  <p>The primary strict cutoff is <strong>&gt;25&nbsp;EU/mL</strong>. A sensitivity analysis counts borderline results as meeting the cutoff (<strong>&ge;20&nbsp;EU/mL</strong>). An individual is panel-positive if at least one of the nine candidate assays meets the relevant cutoff.</p>
-  <p>Three nested definitions are applied among participants whose candidate panel is positive at baseline:</p>
-  <ol>
-    <li><strong>Panel persistence:</strong> at least one candidate assay meets the cutoff at month&nbsp;12.</li>
-    <li><strong>Same-antigen persistence:</strong> at least one antigen that was positive at baseline remains positive at month&nbsp;12, allowing a different immunoglobulin isotype.</li>
-    <li><strong>Same-assay persistence:</strong> at least one <em>identical antigen&ndash;isotype combination</em> is positive at both visits.</li>
-  </ol>
-  <p>Missing assay results (<code>TNP</code>, <code>QNS</code>) are treated as missing, and the recorded censoring tokens (<code>&lt;1.0</code>, <code>&gt;160</code>) are represented by bounds for binary cutoff classification. Paired comparisons use matched participant identifiers and baseline/month-12 visit codes. The script comments specify the bootstrap seeds, confidence-interval methods, model covariance estimators, and Holm adjustment families.</p>
-</section>
-
-<section id="checks">
-  <h2>Basic output checks</h2>
-  <p>The intended paired analysis cohort contains <strong>407 participants</strong> with evaluable results for all eleven antibodies at both time points. The following counts provide a rapid verification of key outputs:</p>
-  <table>
-    <thead><tr><th>Metric</th><th>&gt;25 EU/mL</th><th>&ge;20 EU/mL</th></tr></thead>
-    <tbody>
-      <tr><td>Baseline panel-positive participants</td><td class="num">100</td><td class="num">147</td></tr>
-      <tr><td>Panel persistence</td><td class="num">51/100</td><td class="num">93/147</td></tr>
-      <tr><td>Same-antigen persistence</td><td class="num">45/100</td><td class="num">75/147</td></tr>
-      <tr><td>Same-assay persistence</td><td class="num">38/100</td><td class="num">69/147</td></tr>
-      <tr><td>Newly meeting the panel cutoff</td><td class="num">92</td><td class="num">110</td></tr>
-      <tr><td>No longer meeting the panel cutoff</td><td class="num">49</td><td class="num">54</td></tr>
-    </tbody>
-  </table>
-  <p>These values are descriptive outputs for reproducibility checks. They do not establish diagnostic accuracy, biologic persistence of an antibody response between visits, or clinical utility.</p>
-</section>
-
-<section id="limitations">
-  <h2>Reproducibility and limitations</h2>
-  <ul>
-    <li>This is a secondary analysis of the original randomized trial; the present autoantibody analyses should not be interpreted as estimating a causal treatment effect.</li>
-    <li>Antibody results were measured at two visits approximately one year apart; the data cannot distinguish analytic variation from biological fluctuation or prove continuous positivity between visits.</li>
-    <li>Missing follow-up measurements and exploratory comparisons affect interpretation.</li>
-    <li>Participant-level datasets, case report forms, and original data dictionaries belong to the DREAM source provider and are not redistributed here.</li>
-    <li>External users should verify that the manifest hashes agree with the official files available to them and record the software versions printed by Step&nbsp;01.</li>
-  </ul>
-</section>
-
-<section id="citation">
-  <h2>Data availability and citation</h2>
-  <div class="callout">
-    <p><strong>Original DREAM data:</strong> <a href="https://www.med.upenn.edu/cpob/dream-data-export">University of Pennsylvania DREAM Data and Documents</a></p>
-    <p><strong>Original trial:</strong> Dry Eye Assessment and Management Study Research Group. n-3 fatty acid supplementation for the treatment of dry eye disease. <em>New England Journal of Medicine</em>. 2018;378:1681&ndash;1690. DOI: <a href="https://doi.org/10.1056/NEJMoa1709691">10.1056/NEJMoa1709691</a>.</p>
-    <p><strong>Study title:</strong> One-Year Changes in Candidate Sjögren-Related Serum Autoantibodies Among Patients With Moderate-to-Severe Dry Eye: A Longitudinal Secondary Analysis of the DREAM Trial</p>
-  </div>
-</section>
-
-</main>
-
-<footer>
-  <p>DREAM Autoantibody Persistence — reproducible analysis code for longitudinal candidate Sjögren autoantibody changes in the DREAM trial.</p>
-  <p><a href="https://github.com/DREAM-Autoantibody-Persistence/DREAM-Autoantibody-Persistence.github.io">GitHub repository</a> · <a href="https://github.com/DREAM-Autoantibody-Persistence/DREAM-Autoantibody-Persistence.github.io/blob/main/README.md">README</a></p>
-</footer>
-
+<h1>DREAM Autoantibody Analysis Code</h1>
+<p>Python scripts for the longitudinal secondary analysis of candidate autoantibodies in the DREAM trial.</p>
+<p><a href="https://github.com/DREAM-Autoantibody-Persistence/DREAM-Autoantibody-Persistence.github.io/archive/refs/heads/main.zip">Download code ZIP</a> &middot; <a href="https://github.com/DREAM-Autoantibody-Persistence/DREAM-Autoantibody-Persistence.github.io">GitHub repository</a> &middot; <a href="https://github.com/DREAM-Autoantibody-Persistence/DREAM-Autoantibody-Persistence.github.io/blob/main/README.md">Running instructions</a></p>
+<h2>Analysis scripts</h2>
+<table>
+<thead><tr><th>File</th><th>Contents</th></tr></thead>
+<tbody>
+<tr><td><a href="https://github.com/DREAM-Autoantibody-Persistence/DREAM-Autoantibody-Persistence.github.io/blob/main/RUN_STEP01.py"><code>RUN_STEP01.py</code></a></td><td>Source and environment checks</td></tr>
+<tr><td><a href="https://github.com/DREAM-Autoantibody-Persistence/DREAM-Autoantibody-Persistence.github.io/blob/main/RUN_STEP02.py"><code>RUN_STEP02.py</code></a></td><td>Paired cohort</td></tr>
+<tr><td><a href="https://github.com/DREAM-Autoantibody-Persistence/DREAM-Autoantibody-Persistence.github.io/blob/main/RUN_STEP03.py"><code>RUN_STEP03.py</code></a></td><td>Main antibody results</td></tr>
+<tr><td><a href="https://github.com/DREAM-Autoantibody-Persistence/DREAM-Autoantibody-Persistence.github.io/blob/main/RUN_STEP04.py"><code>RUN_STEP04.py</code></a></td><td>Supporting analyses</td></tr>
+<tr><td><a href="https://github.com/DREAM-Autoantibody-Persistence/DREAM-Autoantibody-Persistence.github.io/blob/main/RUN_STEP05.py"><code>RUN_STEP05.py</code></a></td><td>Manuscript tables</td></tr>
+<tr><td><a href="https://github.com/DREAM-Autoantibody-Persistence/DREAM-Autoantibody-Persistence.github.io/blob/main/RUN_STEP06.py"><code>RUN_STEP06.py</code></a></td><td>Models and sensitivity analyses</td></tr>
+<tr><td><a href="https://github.com/DREAM-Autoantibody-Persistence/DREAM-Autoantibody-Persistence.github.io/blob/main/RUN_STEP07.py"><code>RUN_STEP07.py</code></a></td><td>McNemar tests</td></tr>
+<tr><td><a href="https://github.com/DREAM-Autoantibody-Persistence/DREAM-Autoantibody-Persistence.github.io/blob/main/RUN_STEP08.py"><code>RUN_STEP08.py</code></a></td><td>Randomized-arm comparisons</td></tr>
+</tbody>
+</table>
+<p>Supporting files: <a href="https://github.com/DREAM-Autoantibody-Persistence/DREAM-Autoantibody-Persistence.github.io/blob/main/dream_common.py"><code>dream_common.py</code></a>, <a href="https://github.com/DREAM-Autoantibody-Persistence/DREAM-Autoantibody-Persistence.github.io/blob/main/requirements.txt"><code>requirements.txt</code></a>, <a href="https://github.com/DREAM-Autoantibody-Persistence/DREAM-Autoantibody-Persistence.github.io/blob/main/source_manifest.csv"><code>source_manifest.csv</code></a>.</p>
+<h2>Data and running instructions</h2>
+<p>Obtain the eight source workbooks from the <a href="https://www.med.upenn.edu/cpob/dream-data-export">official DREAM data page</a> and place them in <code>data/</code>. Install the dependencies and run steps 01&ndash;08 as described in the <a href="https://github.com/DREAM-Autoantibody-Persistence/DREAM-Autoantibody-Persistence.github.io/blob/main/README.md">README</a>. Outputs are eight Excel workbooks in <code>results/</code>.</p>
 </body>
 </html>
