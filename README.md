@@ -147,7 +147,3 @@ These values are descriptive outputs for reproducibility checks. They do not est
 **Original trial:** Dry Eye Assessment and Management Study Research Group. n-3 fatty acid supplementation for the treatment of dry eye disease. *New England Journal of Medicine*. 2018;378:1681–1690. DOI: [10.1056/NEJMoa1709691](https://doi.org/10.1056/NEJMoa1709691).
 
 **Accompanying secondary-analysis manuscript:** citation to be added after publication. Until then, please refer to the study title and repository version/commit when citing these scripts.
-
-## Code license
-
-A software license has not yet been assigned. Repository visibility alone does not grant reuse rights. The code authors should choose and add a license after confirming any institutional or collaborator requirements. This statement does not affect the separate rights and conditions governing DREAM source data.
